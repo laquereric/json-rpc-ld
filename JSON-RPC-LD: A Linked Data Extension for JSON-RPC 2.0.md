@@ -1,4 +1,4 @@
-# JSON-RPC-LD: A Linked Data Extension for JSON-RPC 2.0
+# JSON-RPC-LD 0.2: A Linked Data Extension for JSON-RPC 2.0
 
 ## 1. Introduction
 
@@ -6,7 +6,9 @@ This document specifies JSON-RPC-LD, a lightweight extension to the JSON-RPC 2.0
 
 JSON-RPC 2.0 is a simple and effective protocol for remote procedure calls. However, it lacks a standardized mechanism for expressing the semantic meaning of the data exchanged between client and server. This can lead to ambiguity and tight coupling between client and server implementations.
 
-JSON-RPC-LD addresses this by introducing an optional mechanism for embedding JSON-LD contexts within JSON-RPC messages. This allows clients and servers to exchange data that is not only structured but also semantically rich and machine-readable. Furthermore, JSON-RPC-LD provides a way for servers to publish SHACL shapes that define the expected structure and types of the data for each method, enabling robust validation and clear documentation.
+JSON-RPC-LD addresses this by introducing a mandatory mechanism for embedding JSON-LD contexts within JSON-RPC messages. This allows clients and servers to exchange data that is not only structured but also semantically rich and machine-readable. Furthermore, JSON-RPC-LD provides a way for servers to publish SHACL shapes that define the expected structure and types of the data for each method, enabling robust validation and clear documentation.
+
+**Note on Interoperability:** JSON-RPC and JSON-RPC-LD are interoperable only to the degree that applications accommodate that feature. This specification itself does not allow any unconstrained data types - all data types must be explicitly defined through JSON-LD contexts and validated against SHACL shapes.
 
 ### 1.1. Conventions
 
@@ -20,9 +22,9 @@ JSON-RPC-LD introduces the following modifications to the standard JSON-RPC 2.0 
 
 ### 2.1. The `@context` Member
 
-A JSON-RPC-LD Request or Response object MAY include a `@context` member within the `params` or `result` object, respectively. The value of the `@context` member MUST be a valid JSON-LD context, as defined in the JSON-LD 1.1 specification [2].
+A JSON-RPC-LD Request or Response object MUST include a `@context` member within the `params` or `result` object, respectively. The value of the `@context` member MUST be a valid JSON-LD context, as defined in the JSON-LD 1.1 specification [2].
 
-When present, the `@context` provides a mapping from the terms used in the `params` or `result` object to IRIs, enabling the data to be interpreted as Linked Data.
+The `@context` provides a mapping from the terms used in the `params` or `result` object to IRIs, enabling the data to be interpreted as Linked Data. This mandatory context ensures that all data exchanged through JSON-RPC-LD has explicit semantic meaning and prevents ambiguity in data interpretation.
 
 ### 2.2. SHACL-based Validation
 
