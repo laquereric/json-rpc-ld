@@ -7,36 +7,42 @@ actor "Client" as client
 actor "MCP Client" as mcpClient
 
 ' === CONTROLLER LAYER ===
-package "API Gateway (Controllers)" {
-    component "RpcController" as rpcCtrl #ffd54f {
-        note right: JSON-RPC 2.0\nService Router
-    }
-    component "McpController" as mcpCtrl #fff3e0 {
-        note right: Model Context\nProtocol Bridge
-    }
-    component "ContextController" as ctxCtrl #e3f2fd {
-        note right: JSON-LD\nVocabulary
-    }
+package "API Gateway (Controllers)" #ffd54f {
+    component "RpcController" as rpcCtrl
+    component "McpController" as mcpCtrl #fff3e0
+    component "ContextController" as ctxCtrl #e3f2fd
     component "InfoController" as infoCtrl #c8e6c9
 }
 
+note right of rpcCtrl
+    JSON-RPC 2.0
+    Service Router
+end note
+
+note right of mcpCtrl
+    Model Context
+    Protocol Bridge
+end note
+
 ' === SERVICE DISCOVERY ===
-package "Service Registry" {
-    component "mcp-skill-sot" as skillSot #f8bbd9 {
-        entity "Mcp" as mcp
-        entity "Skill" as skill
-    }
+package "Service Registry" #f8bbd9 {
+    component "mcp-skill-sot" as skillSot
     component "ENV Fallback" as envFallback #e8e8e8
 }
 
+note right of skillSot
+    Mcp model
+    Skill model
+end note
+
 ' === DOWNSTREAM SERVICES ===
 package "Microservices" #e8f5e9 {
-    component "at_context\n:3017" as ctxSvc
-    component "magentic_id\n:3011" as idSvc
-    component "magentic_mail\n:3012" as mailSvc
-    component "magentic_rubygems\n:3015" as gemsSvc
-    component "magentic_github\n:3013" as gitSvc
-    component "magentic_host\n:3014" as hostSvc
+    component "at_context :3017" as ctxSvc
+    component "magentic_id :3011" as idSvc
+    component "magentic_mail :3012" as mailSvc
+    component "magentic_rubygems :3015" as gemsSvc
+    component "magentic_github :3013" as gitSvc
+    component "magentic_host :3014" as hostSvc
 }
 
 ' === CONNECTIONS ===
@@ -49,8 +55,6 @@ mcpClient --> mcpCtrl : GET /.well-known/mcp.json
 
 rpcCtrl --> skillSot : lookup service
 rpcCtrl --> envFallback : fallback URLs
-skillSot --> mcp
-skillSot --> skill
 
 rpcCtrl --> ctxSvc : context.*
 rpcCtrl --> idSvc : identity.*
@@ -58,8 +62,6 @@ rpcCtrl --> mailSvc : mail.*
 rpcCtrl --> gemsSvc : rubygems.*
 rpcCtrl --> gitSvc : github.*
 rpcCtrl --> hostSvc : host.*
-
-mcpCtrl --> skill : get tool schemas
 
 ' === REQUEST FLOW ===
 note as flow
@@ -92,20 +94,6 @@ note as endpoints
     -32603: Internal error
 end note
 
-' === JSON-LD CONTEXT ===
-note as context
-    **JSON-LD Types**
-    Identity: User, Agent, Identity
-    Auth: Permission, Delegation
-    Services: Gem, Repository
-              Message, Application
-
-    **Ontologies**
-    schema.org
-    magentic namespace
-    XSD types
-end note
-
 ' === LEGEND ===
 legend right
     |= Color |= Meaning |
@@ -115,16 +103,5 @@ legend right
     | <#f8bbd9> | Skill Registry |
     | <#e8f5e9> | Microservice |
 endlegend
-
-note as tech
-    **Tech Stack**
-    Rails 8.1 Engine
-    JSON-RPC 2.0
-    JSON-LD
-    MCP Protocol
-
-    **Port**: 3016
-    **Phase**: 2 (API Gateway)
-end note
 
 @enduml
