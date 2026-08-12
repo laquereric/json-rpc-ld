@@ -10,6 +10,8 @@
 
 > **Non-negotiable architectural boundary.** There is exactly **one** server implementation: the Rails API backed by SQLite. It owns canonical data, schema migrations, authorization, provenance, and the publication allow-list. A client application is never a server replacement. A client has its own local SQLite database and communicates only through this protocol.
 
+**Relationship to JSON-RPC-LD.** JSON-RPC-LD is the larger, general protocol (a Linked Data extension of JSON-RPC 2.0; see the JSON-RPC-LD spec in this repo). The Cyborg Channel protocol specified here is a domain PROFILE that CONFORMS TO JSON-RPC-LD: it uses the JSON-RPC-LD envelope, method dispatch, and JSON-LD framing, and adds the three-ledger StoreFile model, the sync-intent allow-list, and the SHACL shape layer.
+
 ## 1. Purpose, scope, and invariants
 
 This specification defines a language-neutral synchronization channel between a single authoritative Rails API and many independently implemented client applications. The channel is **JSON-RPC 2.0 whose domain payloads are JSON-LD 1.1**. JSON-RPC supplies a compact request/response envelope, named methods, correlation identifiers, and standard error conventions; JSON-LD supplies stable identifiers and a self-describing vocabulary for records. JSON-RPC is transport-agnostic and its request parameters may be named objects, while JSON-LD is specifically designed to add linked-data identifiers and contexts to ordinary JSON representations.[1] [2]

@@ -1,1 +1,0 @@
-Rails.application.config.secret_key_base = "test_secret_key_base_for_dummy_app_development_only"
