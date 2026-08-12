@@ -1,0 +1,20 @@
+# Private-local ledger record shape (v0.2) -- plan section 4.3.
+@prefix sh:  <http://www.w3.org/ns/shacl#> .
+@prefix sf:  <https://sync.example.org/ns/storefile#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix cyb: <https://railsruntimes.org/ns/cyborg-shapes#> .
+
+# Valid ONLY in the local store. It is never negotiated onto the wire.
+cyb:PrivateLocalRecordShape a sh:NodeShape ;
+  sh:targetClass sf:PrivateLocalRecord ;
+  sh:property [ sh:path sf:store ;         sh:minCount 1 ; sh:nodeKind sh:IRI ] ;
+  sh:property [ sh:path sf:schemaVersion ; sh:minCount 1 ; sh:datatype xsd:integer ] .
+
+# Transmission prohibition (applied by the validator to EVERY node of any outbound payload --
+# canonical.pull result graphs and syncIntent.push params): no transmitted node may be typed
+# sf:PrivateLocalRecord. private_local NEVER leaves the app.
+cyb:NoPrivateLocalInTransitShape a sh:NodeShape ;
+  sh:targetClass sf:PrivateLocalRecord ;
+  sh:deactivated false ;
+  sh:property [ sh:path sf:store ; sh:maxCount 0 ;
+                sh:message "A PrivateLocalRecord appeared in a transmitted payload -- forbidden." ] .

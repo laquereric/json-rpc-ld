@@ -1,0 +1,25 @@
+# Cyborg App JSON-RPC-LD channel -- common envelope + provenance shapes (v0.2)
+# Normative validation layer for cyborg_app_jsonrpcld_channel_plan_v0.2.md.
+# Vocabulary aligns with the plan section 3.2 (sf: = the deployment StoreFile namespace).
+@prefix sh:  <http://www.w3.org/ns/shacl#> .
+@prefix sf:  <https://sync.example.org/ns/storefile#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix cyb: <https://railsruntimes.org/ns/cyborg-shapes#> .
+
+# Every StoreFile-scoped ledger record: node is an IRI/URN (@id), carries a type (@type),
+# and is bound to a StoreFile at a schema version. (@context presence is a JSON-LD-processing
+# concern, verified before SHACL runs -- it does not survive into the RDF graph.)
+cyb:EnvelopeShape a sh:NodeShape ;
+  sh:targetClass sf:CanonicalRecord, sf:SyncIntent, sf:PrivateLocalRecord ;
+  sh:nodeKind sh:IRI ;
+  sh:property [ sh:path rdf:type ;         sh:minCount 1 ] ;
+  sh:property [ sh:path sf:store ;         sh:minCount 1 ; sh:nodeKind sh:IRI ] ;
+  sh:property [ sh:path sf:schemaVersion ; sh:minCount 1 ; sh:maxCount 1 ; sh:datatype xsd:integer ; sh:minInclusive 1 ] .
+
+cyb:ProvenanceShape a sh:NodeShape ;
+  sh:targetClass sf:Provenance ;
+  sh:property [ sh:path sf:recordedBy ; sh:minCount 1 ; sh:nodeKind sh:IRI ] ;
+  sh:property [ sh:path sf:source ;     sh:minCount 1 ; sh:datatype xsd:string ] ;
+  sh:property [ sh:path sf:device ;     sh:maxCount 1 ; sh:nodeKind sh:IRI ] ;
+  sh:property [ sh:path sf:recordedAt ; sh:minCount 1 ; sh:datatype xsd:dateTime ] .

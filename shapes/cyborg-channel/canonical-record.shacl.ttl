@@ -1,0 +1,21 @@
+# Canonical ledger record shape (v0.2) -- plan section 4.1.
+# Server-authoritative; carries version/state/provenance the client MUST NOT set.
+@prefix sh:  <http://www.w3.org/ns/shacl#> .
+@prefix sf:  <https://sync.example.org/ns/storefile#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix cyb: <https://railsruntimes.org/ns/cyborg-shapes#> .
+
+# NOT closed: negotiated per-StoreFile application terms (tool:*) are permitted.
+cyb:CanonicalRecordShape a sh:NodeShape ;
+  sh:targetClass sf:CanonicalRecord ;
+  sh:property [ sh:path sf:store ;         sh:minCount 1 ; sh:maxCount 1 ; sh:nodeKind sh:IRI ] ;
+  sh:property [ sh:path sf:schemaVersion ; sh:minCount 1 ; sh:datatype xsd:integer ; sh:minInclusive 1 ] ;
+  sh:property [ sh:path sf:version ;       sh:minCount 1 ; sh:maxCount 1 ; sh:datatype xsd:integer ] ;
+  sh:property [ sh:path sf:state ;         sh:minCount 1 ; sh:maxCount 1 ; sh:datatype xsd:string ] ;
+  sh:property [ sh:path sf:updatedAt ;     sh:maxCount 1 ; sh:datatype xsd:dateTime ] ;
+  sh:property [ sh:path sf:provenance ;    sh:minCount 1 ; sh:maxCount 1 ; sh:node cyb:ProvenanceShape ] .
+
+# A tombstone is a CanonicalRecord with sf:state "deleted" and no ordinary application fields.
+cyb:CanonicalTombstoneShape a sh:NodeShape ;
+  sh:targetClass sf:CanonicalRecord ;
+  sh:property [ sh:path sf:state ; sh:in ( "active" "deleted" ) ] .

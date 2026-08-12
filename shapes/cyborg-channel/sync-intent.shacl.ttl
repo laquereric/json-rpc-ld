@@ -1,0 +1,36 @@
+# Sync-intent + patch shapes (v0.2) -- plan sections 4.2 / 6.
+# THE PRIVACY + AUTHORITY BOUNDARY, made machine-checkable.
+@prefix sh:  <http://www.w3.org/ns/shacl#> .
+@prefix sf:  <https://sync.example.org/ns/storefile#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix cyb: <https://railsruntimes.org/ns/cyborg-shapes#> .
+
+# sh:closed true is the whole point: a SyncIntent may carry ONLY the properties declared
+# below. Any server-authoritative field (sf:version, sf:state, sf:provenance, sf:updatedAt)
+# or ANY private/local field that appears in a SyncIntent is a SHACL violation. The push is
+# rejected before it can touch canonical state -- private_local can never ride out on an intent.
+cyb:SyncIntentShape a sh:NodeShape ;
+  sh:targetClass sf:SyncIntent ;
+  sh:closed true ;
+  sh:ignoredProperties ( rdf:type ) ;
+  sh:property [ sh:path sf:operationId ;   sh:minCount 1 ; sh:maxCount 1 ; sh:nodeKind sh:IRI ] ;
+  sh:property [ sh:path sf:store ;         sh:minCount 1 ; sh:maxCount 1 ; sh:nodeKind sh:IRI ] ;
+  sh:property [ sh:path sf:schemaVersion ; sh:minCount 1 ; sh:maxCount 1 ; sh:datatype xsd:integer ] ;
+  sh:property [ sh:path sf:policyEpoch ;   sh:minCount 1 ; sh:maxCount 1 ; sh:datatype xsd:integer ] ;
+  sh:property [ sh:path sf:target ;        sh:minCount 1 ; sh:maxCount 1 ; sh:nodeKind sh:IRI ] ;
+  sh:property [ sh:path sf:baseVersion ;   sh:minCount 1 ; sh:maxCount 1 ; sh:datatype xsd:integer ] ;
+  sh:property [ sh:path sf:createdAt ;     sh:minCount 1 ; sh:maxCount 1 ; sh:datatype xsd:dateTime ] ;
+  sh:property [ sh:path sf:device ;        sh:minCount 1 ; sh:maxCount 1 ; sh:nodeKind sh:IRI ] ;
+  sh:property [ sh:path sf:patches ;       sh:minCount 1 ; sh:node cyb:PatchShape ] .
+
+# A patch names EXACTLY ONE field and one of three ops. The legal sf:path values and the
+# per-path value profile are the ALLOW-LIST, projected per StoreFile (allowlist.template.shacl.ttl).
+# sh:closed forbids smuggling extra keys; a value MUST NOT itself carry an @context.
+cyb:PatchShape a sh:NodeShape ;
+  sh:targetClass sf:Patch ;
+  sh:closed true ;
+  sh:ignoredProperties ( rdf:type ) ;
+  sh:property [ sh:path sf:op ;    sh:minCount 1 ; sh:maxCount 1 ; sh:in ( "add" "replace" "remove" ) ] ;
+  sh:property [ sh:path sf:path ;  sh:minCount 1 ; sh:maxCount 1 ; sh:datatype xsd:string ] ;
+  sh:property [ sh:path sf:value ; sh:maxCount 1 ] .
