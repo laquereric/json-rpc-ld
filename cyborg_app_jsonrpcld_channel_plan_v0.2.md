@@ -1,6 +1,6 @@
 # Portable Local-First Client and JSON-RPC-LD Channel Specification
 
-**Version:** 0.2 (2026-08-12). Adds a normative SHACL shape-file layer under `shapes/cyborg-channel/` as the machine-checkable form of the three-ledger + allow-list constraints. v0.1 was the initial Manus draft. See Appendix S.
+**Version:** 0.2 (2026-08-12). Adds a normative SHACL shape-file layer under `shapes/cyborg-channel/` as the machine-checkable form of the three-ledger + allow-list constraints. v0.1 was the initial Manus draft.
 
 **Changelog v0.1 -> v0.2:** the wire constraints in sections 3.3, 4.1, 4.2, 4.3, and 6 are now backed by SHACL shape files -- server validates on ingest, client validates before push, conformance validates fixtures. The sync-intent/patch shapes are `sh:closed`, so the allow-list and the invariant that no server-authoritative or private field crosses are enforced by a standard validator rather than ad-hoc code.
 
@@ -111,8 +111,6 @@ Records MUST use stable absolute IRIs or URNs in `@id`. A resource identifier is
 
 ### 3.3 Common record envelope
 
-> **SHACL (v0.2):** `shapes/cyborg-channel/envelope.shacl.ttl` (cyb:EnvelopeShape, cyb:ProvenanceShape).
-
 All domain records—including request parameter records, result records, canonical records, `SyncIntent` records, private records, patch records, policy records, and structured error records—MUST contain the fields below.
 
 | Field | Type | Requirement |
@@ -138,8 +136,6 @@ The three ledgers are separate logical datasets. They may be separate SQLite tab
 | `private_local` | Local SQLite only | Client/user | Drafts, device preferences, UI state, private annotations, unreleased values, secrets references, and local workflow state. | **Never leaves the client.** |
 
 ### 4.1 Canonical record shape
-
-> **SHACL (v0.2):** `shapes/cyborg-channel/canonical-record.shacl.ttl` (cyb:CanonicalRecordShape, cyb:CanonicalTombstoneShape).
 
 A canonical record is both a linked-data resource and an authoritative versioned fact. The user-defined fields shown below (`tool:title` and `tool:status`) are examples; the actual allowable entity types and terms are negotiated per StoreFile schema.
 
@@ -173,8 +169,6 @@ A canonical record is both a linked-data resource and an authoritative versioned
 A deletion is represented as a canonical tombstone, not a physical absence from a pull page. It retains `@context`, `@id`, StoreFile, schema version, a new canonical version, `sf:state: "deleted"`, and provenance, but omits ordinary application fields. A client MUST upsert a tombstone locally, remove it from active presentation, and retain it at least until the cursor that delivered it has been committed.
 
 ### 4.2 Sync-intent record shape
-
-> **SHACL (v0.2):** `shapes/cyborg-channel/sync-intent.shacl.ttl` (cyb:SyncIntentShape + cyb:PatchShape, both sh:closed -- the machine-checkable allow-list/privacy boundary).
 
 A SyncIntent is a durable request to publish a narrow, explicitly allowed change. It is not a claimed canonical record. It MUST carry the canonical version against which the user made the change and an immutable `sf:operationId`. Each patch is itself a JSON-LD record with a UUID URN, so every transport-visible record is self-identifying.
 
@@ -211,8 +205,6 @@ A SyncIntent is a durable request to publish a narrow, explicitly allowed change
 The only valid patch operations in version 1.0 are `add`, `replace`, and `remove`. An allow-list rule specifies which operations are legal for each exact JSON Pointer path and the value profile accepted by `add` and `replace`. A patch MUST name exactly one target field; wildcard paths, arbitrary JSON Patch operation types, executable expressions, and values containing a `@context` are prohibited. The server obtains actor, time, provenance, resulting version, and canonical merge result itself.
 
 ### 4.3 Private-local record shape
-
-> **SHACL (v0.2):** `shapes/cyborg-channel/private-local.shacl.ttl` (cyb:PrivateLocalRecordShape, cyb:NoPrivateLocalInTransitShape).
 
 A PrivateLocal record has a local-only identity distinct from its canonical target. Its values may reference a canonical target for presentation, but they are not patch material and may never be converted implicitly into a SyncIntent.
 
@@ -470,8 +462,6 @@ A usable device-token channel needs a controlled enrollment flow. The protocol t
 `device.enroll` is called only during an authenticated setup ceremony—such as an existing Rails session, an administrator-issued one-time code, or a platform-native sign-in. It accepts a device record with `@context`, `@id`, client name, platform, and an optional public-key thumbprint. It returns a single opaque, scoped device token, its expiry, and the device’s authorized StoreFile identifiers. The token MUST be displayed or returned only once, must be revocable per device, and must be stored outside ledgers. `device.renew` rotates an unexpired credential and invalidates the old token after a short overlap. Neither method may expose canonical or private records.
 
 ## 6. Server validation, allow-list authority, and policy mirroring
-
-> **SHACL (v0.2):** the allow-list is projected per StoreFile as `shapes/cyborg-channel/allowlist.template.shacl.ttl`; the server validates every ingested payload against the shapes in `shapes/cyborg-channel/`, and a client mirrors them read-only to pre-validate. See Appendix S.
 
 The server’s allow-list is final regardless of what a client cached or generated. The server MUST validate, in this order, before any canonical mutation:
 
@@ -737,32 +727,6 @@ After this milestone, implement the JavaScript browser reference next. It exerci
 ## 14. Final acceptance criteria
 
 The plan is implemented correctly only if all of the following are true: there is one Rails API and one canonical schema/migration authority; every client maintains its own local SQLite with all three logical ledgers; every protocol record sent or received has `@context` and `@id`; canonical data is acquired through cursored pull; only exact allow-listed SyncIntent patches are pushed; private-local values cannot be serialized into an outbound request; stale writes do not override server canonical data; operation IDs make retries idempotent; and Python, JavaScript, Java, and Rust all pass the same conformance suite against the same Rails fixture API.
-
-## Appendix S -- SHACL shape files (normative, added in v0.2)
-
-Every ledger record and wire payload is a JSON-LD graph; the shape files under
-`shapes/cyborg-channel/` are the normative, machine-checkable form of this specification. They are
-validated by the **server on ingest** (authoritative), by a **client before push** (fail fast), and
-by the **conformance suite** (section 10) against the shared fixtures -- so all four language clients
-and the Rails server enforce ONE contract, not N reimplementations.
-
-| Shape file | Validates | Sections |
-|---|---|---|
-| `envelope.shacl.ttl` | common envelope (@id is an IRI, @type, StoreFile binding) + provenance | 3.3 |
-| `canonical-record.shacl.ttl` | canonical records + tombstones | 4.1 |
-| `sync-intent.shacl.ttl` | **sh:closed** sync-intent + patch -- the allow-list/privacy boundary | 4.2, 6 |
-| `private-local.shacl.ttl` | private-local records + the never-transmit rule | 4.3 |
-| `allowlist.template.shacl.ttl` | per-StoreFile allow-list (generated; client mirrors read-only) | 6 |
-
-**Why closed shapes matter.** `sh:closed true` on cyb:SyncIntentShape and cyb:PatchShape means a
-SyncIntent may carry only the declared properties. A server-authoritative field (sf:version,
-sf:state, sf:provenance, sf:updatedAt) or any private/local field appearing in an intent is a SHACL
-violation -- the push is rejected before it can touch canonical state. That is the invariant
-"private_local never leaves; the app never claims canonical authority", enforced by a validator.
-
-Vocabulary (sf:) follows section 3.2; `sync.example.org` is illustrative -- each deployment
-substitutes its own immutable namespace and pinned JSON-LD context, and generates the per-StoreFile
-allow-list shape from its authoritative allow-list.
 
 ## References
 
