@@ -11,7 +11,7 @@ implementation lives here; the reference implementation is the invariant Rails A
   between a Cyborg App's local SQLite (OPFS-SQLite in the browser) and an invariant
   Rails API. File: `cyborg_app_jsonrpcld_channel_plan_v0.2.md`.
 
-- **SHACL shapes** -- `shapes/cyborg-channel/`: the normative, machine-checkable
+- **SHACL shapes** -- now hosted in the osi-level-8 repo (`shapes/cyborg-channel/` there: https://github.com/laquereric/osi-level-8); previously `shapes/cyborg-channel/` here: the normative, machine-checkable
   validation layer for Cyborg Channel records. The closed sync-intent/patch shapes make
   the allow-list + privacy invariant (private_local never leaves; no server-authoritative
   field crosses) validator-enforced.
