@@ -32,6 +32,8 @@ A JSON-RPC-LD server MAY provide a SHACL shapes graph to describe the expected s
 
 The mechanism for discovering the SHACL shapes graph is not defined in this specification, but it is RECOMMENDED that servers provide a link to the shapes graph in their API documentation.
 
+This specification mandates SHACL as the validation mechanism but does not itself define any specific shapes: the shapes graph for a given method is defined by the server, or by a profile that conforms to JSON-RPC-LD.
+
 ## 3. Example
 
 Consider a simple JSON-RPC method `getUser` that retrieves information about a user.
@@ -78,42 +80,6 @@ The server can respond with a JSON-RPC-LD response that also includes a `@contex
   },
   "id": 1
 }
-```
-
-### 3.3. SHACL Shapes
-
-The server could provide the following SHACL shapes graph to describe the `getUser` method:
-
-```turtle
-@prefix sh: <http://www.w3.org/ns/shacl#> .
-@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
-@prefix ex: <http://example.org/> .
-
-ex:GetUserParamsShape
-  a sh:NodeShape ;
-  sh:targetClass ex:User ;
-  sh:property [
-    sh:path ex:User#id ;
-    sh:datatype xsd:integer ;
-    sh:minCount 1 ;
-    sh:maxCount 1 ;
-  ] .
-
-ex:GetUserResultShape
-  a sh:NodeShape ;
-  sh:targetClass ex:User ;
-  sh:property [
-    sh:path <http://xmlns.com/foaf/0.1/name> ;
-    sh:datatype xsd:string ;
-    sh:minCount 1 ;
-    sh:maxCount 1 ;
-  ] ;
-  sh:property [
-    sh:path <http://xmlns.com/foaf/0.1/mbox> ;
-    sh:datatype xsd:string ;
-    sh:minCount 1 ;
-    sh:maxCount 1 ;
-  ] .
 ```
 
 ## 4. References

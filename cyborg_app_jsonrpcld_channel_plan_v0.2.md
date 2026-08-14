@@ -1,8 +1,8 @@
 # Portable Local-First Client and JSON-RPC-LD Channel Specification
 
-**Version:** 0.2 (2026-08-12). Adds a normative SHACL shape-file layer under `shapes/cyborg-channel/` as the machine-checkable form of the three-ledger + allow-list constraints. v0.1 was the initial Manus draft.
+**Version:** 0.2 (2026-08-12). v0.1 was the initial Manus draft.
 
-**Changelog v0.1 -> v0.2:** the wire constraints in sections 3.3, 4.1, 4.2, 4.3, and 6 are now backed by SHACL shape files -- server validates on ingest, client validates before push, conformance validates fixtures. The sync-intent/patch shapes are `sh:closed`, so the allow-list and the invariant that no server-authoritative or private field crosses are enforced by a standard validator rather than ad-hoc code.
+**Changelog v0.1 -> v0.2:** the wire constraints in sections 3.3, 4.1, 4.2, 4.3, and 6 are validated with SHACL -- server validates on ingest, client validates before push, conformance validates fixtures. The sync-intent/patch shapes are `sh:closed`, so the allow-list and the invariant that no server-authoritative or private field crosses are enforced by a standard validator rather than ad-hoc code.
 
 **Status:** Implementation-ready plan for protocol version 1.0  
 **Scope:** One invariant Rails API with SQLite; portable local-first client applications in Python, JavaScript, Java, and Rust.  
@@ -10,7 +10,7 @@
 
 > **Non-negotiable architectural boundary.** There is exactly **one** server implementation: the Rails API backed by SQLite. It owns canonical data, schema migrations, authorization, provenance, and the publication allow-list. A client application is never a server replacement. A client has its own local SQLite database and communicates only through this protocol.
 
-**Relationship to JSON-RPC-LD.** JSON-RPC-LD is the larger, general protocol (a Linked Data extension of JSON-RPC 2.0; see the JSON-RPC-LD spec in this repo). The Cyborg Channel protocol specified here is a domain PROFILE that CONFORMS TO JSON-RPC-LD: it uses the JSON-RPC-LD envelope, method dispatch, and JSON-LD framing, and adds the three-ledger StoreFile model, the sync-intent allow-list, and the SHACL shape layer.
+**Relationship to JSON-RPC-LD.** JSON-RPC-LD is the larger, general protocol (a Linked Data extension of JSON-RPC 2.0; see the JSON-RPC-LD spec in this repo). The Cyborg Channel protocol specified here is a domain PROFILE that CONFORMS TO JSON-RPC-LD: it uses the JSON-RPC-LD envelope, method dispatch, and JSON-LD framing, and adds the three-ledger StoreFile model, the sync-intent allow-list, and SHACL validation of its records.
 
 ## 1. Purpose, scope, and invariants
 
