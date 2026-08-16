@@ -1,0 +1,78 @@
+@prefix jrl:  <https://w3id.org/laquereric/json-rpc-ld/ns#> .
+@prefix owl:  <http://www.w3.org/2002/07/owl#> .
+@prefix rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct:  <http://purl.org/dc/terms/> .
+
+<https://w3id.org/laquereric/json-rpc-ld/ontology/core/1.0.0>
+  a owl:Ontology ;
+  owl:versionIRI <https://w3id.org/laquereric/json-rpc-ld/ontology/core/1.0.0> ;
+  owl:versionInfo "1.0.0" ;
+  rdfs:label "JSON-RPC-LD core ontology"@en ;
+  rdfs:comment "Transport-neutral JSON-RPC 2.0 + JSON-LD vocabulary: envelope, outcome, operation, and JSON-LD identity terms. OWL gives meaning; SHACL decides a concrete message's validity."@en ;
+  rdfs:seeAlso <https://github.com/laquereric/json-rpc-ld> , <https://www.jsonrpc.org/specification> .
+
+jrl:Envelope a owl:Class ;
+  rdfs:label "JSON-RPC-LD envelope"@en ;
+  rdfs:comment "A never-raise JSON-RPC-LD request or response container carrying a portable @id and a caller-supplied operationId."@en ;
+  rdfs:isDefinedBy <https://w3id.org/laquereric/json-rpc-ld/ontology/core/1.0.0> .
+
+jrl:Operation a owl:Class ;
+  rdfs:label "operation"@en ;
+  rdfs:comment "A named, CID-declared method that an envelope may invoke."@en ;
+  rdfs:isDefinedBy <https://w3id.org/laquereric/json-rpc-ld/ontology/core/1.0.0> .
+
+jrl:Outcome a owl:Class ;
+  rdfs:label "outcome"@en ;
+  rdfs:comment "The typed result of an envelope: a Result or an Error, never a raised exception."@en ;
+  rdfs:isDefinedBy <https://w3id.org/laquereric/json-rpc-ld/ontology/core/1.0.0> .
+
+jrl:Result a owl:Class ;
+  rdfs:subClassOf jrl:Outcome ;
+  rdfs:label "result"@en ;
+  rdfs:comment "A successful outcome: { ok: true, ... }."@en ;
+  rdfs:isDefinedBy <https://w3id.org/laquereric/json-rpc-ld/ontology/core/1.0.0> .
+
+jrl:Error a owl:Class ;
+  rdfs:subClassOf jrl:Outcome ;
+  rdfs:label "error"@en ;
+  rdfs:comment "A failure outcome: { ok: false, reason, because }."@en ;
+  rdfs:isDefinedBy <https://w3id.org/laquereric/json-rpc-ld/ontology/core/1.0.0> .
+
+jrl:invokesOperation a owl:ObjectProperty ;
+  rdfs:domain jrl:Envelope ; rdfs:range jrl:Operation ;
+  rdfs:label "invokes operation"@en ;
+  rdfs:comment "Links an envelope to the operation it invokes."@en ;
+  rdfs:isDefinedBy <https://w3id.org/laquereric/json-rpc-ld/ontology/core/1.0.0> .
+
+jrl:hasOutcome a owl:ObjectProperty ;
+  rdfs:domain jrl:Envelope ; rdfs:range jrl:Outcome ;
+  rdfs:label "has outcome"@en ;
+  rdfs:isDefinedBy <https://w3id.org/laquereric/json-rpc-ld/ontology/core/1.0.0> .
+
+jrl:operationId a owl:DatatypeProperty ;
+  rdfs:domain jrl:Envelope ; rdfs:range xsd:string ;
+  rdfs:label "operation identifier"@en ;
+  rdfs:comment "Caller-supplied idempotency key for the invocation."@en ;
+  rdfs:isDefinedBy <https://w3id.org/laquereric/json-rpc-ld/ontology/core/1.0.0> .
+
+jrl:jsonRpcVersion a owl:DatatypeProperty ;
+  rdfs:domain jrl:Envelope ; rdfs:range xsd:string ;
+  rdfs:label "JSON-RPC version"@en ;
+  rdfs:isDefinedBy <https://w3id.org/laquereric/json-rpc-ld/ontology/core/1.0.0> .
+
+jrl:methodName a owl:DatatypeProperty ;
+  rdfs:domain jrl:Operation ; rdfs:range xsd:string ;
+  rdfs:label "method name"@en ;
+  rdfs:isDefinedBy <https://w3id.org/laquereric/json-rpc-ld/ontology/core/1.0.0> .
+
+jrl:reason a owl:DatatypeProperty ;
+  rdfs:domain jrl:Error ; rdfs:range xsd:string ;
+  rdfs:label "reason"@en ;
+  rdfs:isDefinedBy <https://w3id.org/laquereric/json-rpc-ld/ontology/core/1.0.0> .
+
+jrl:because a owl:DatatypeProperty ;
+  rdfs:domain jrl:Error ; rdfs:range xsd:string ;
+  rdfs:label "because"@en ;
+  rdfs:isDefinedBy <https://w3id.org/laquereric/json-rpc-ld/ontology/core/1.0.0> .
