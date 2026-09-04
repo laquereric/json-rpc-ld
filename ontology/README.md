@@ -4,8 +4,8 @@
 `Operation`, `Outcome` (`Result` / `Error`), and the identity/idempotency datatype
 properties (`operationId`, `jsonRpcVersion`, `methodName`, `reason`, `because`).
 
-- **Ontology IRI:** `https://w3id.org/laquereric/json-rpc-ld/ontology/core/1.0.0`
-- **Term namespace:** `https://w3id.org/laquereric/json-rpc-ld/ns#` (`jrl:`)
+- **Ontology IRI:** `https://w3id.org/json-rpc-ld/ontology/core/1.0.0`
+- **Term namespace:** `https://w3id.org/json-rpc-ld/ns#` (`jrl:`)
 
 It is the **root of the import chain**: it imports nothing, and a profile that
 specializes JSON-RPC-LD imports it. OWL states *meaning*; a profile states closed
